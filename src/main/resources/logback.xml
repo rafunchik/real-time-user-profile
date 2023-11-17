@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <property name="stdout_pattern_layout"
+            value="%d{yyyy-MM-dd HH:mm:ss} %-5level %logger:%n> %msg [%thread]%n"/>
+  <property name="rolling_pattern_layout"
+            value="%d{yyyy-MM-dd HH:mm:ss} %-5level %logger:%n> %msg [%thread]%n"/>
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <layout class="ch.qos.logback.classic.PatternLayout">
+      <Pattern>${stdout_pattern_layout}</Pattern>
+    </layout>
+  </appender>
+
+  <if condition='isDefined("LOGS_PATH")'>
+    <then>
+      <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS_PATH}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+          <!-- rollover daily -->
+          <fileNamePattern>app-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+          <!-- each file should be at most 100MB, keep 30 days worth of history, but at most 8GB -->
+          <maxFileSize>100MB</maxFileSize>
+          <maxHistory>30</maxHistory>
+          <totalSizeCap>8GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+          <pattern>${rolling_pattern_layout}</pattern>
+        </encoder>
+      </appender>
+
+      <root level="info">
+        <appender-ref ref="ROLLING" />
+      </root>
+    </then>
+  </if>
+
+  <logger name="org.apache.kafka.common.metrics" level="warn" />
+  <logger name="org.apache.zookeeper" level="warn" />
+  <logger name="kafka.server.BrokerMetadataCheckpoint" level="warn" />
+  <logger name="org.apache.kafka.clients.NetworkClient" level="debug" />
+  <logger name="org.apache.kafka.clients.admin.AdminClientConfig" level="debug" />
+  <logger name="org.apache.kafka.clients.consumer.ConsumerConfig" level="debug" />
+  <logger name="org.apache.kafka.streams.StreamsConfig" level="debug"/>
+  <logger name="org.apache.kafka.clients.producer.ProducerConfig" level="debug"/>
+  <!--    <logger name="com.github.chris_zen.prometheus.bridge.datadog" level="trace" />-->
+
+  <root level="DEBUG">
+    <appender-ref ref="STDOUT" />
+  </root>
+
+</configuration>

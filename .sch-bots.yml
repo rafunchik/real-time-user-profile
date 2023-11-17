@@ -1,0 +1,14 @@
+qualityGate:
+  codeAnalysis:
+    mediumsLimit: 0
+    enabled: true
+    spamThreshold: 10
+    lowsLimit: 0
+    highsLimit: 0
+
+  coverage:
+    acceptedDeltaPercentage: 1
+    enabled: true
+
+  JIRA:
+    enabled: true

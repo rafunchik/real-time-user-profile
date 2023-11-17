@@ -1,0 +1,38 @@
+dist: trusty
+
+language: scala
+scala: 2.12.8
+
+jdk: oraclejdk8
+
+before_cache:
+  # Tricks to avoid unnecessary cache updates
+  - find $HOME/.sbt        -name "*.lock"               -delete
+  - find $HOME/.ivy2/cache -name "ivydata-*.properties" -delete
+  - find $HOME/.sbt        -name "*.lock"               -delete
+
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt/boot/scala-$TRAVIS_SCALA_VERSION
+    - $HOME/.sbt/launchers
+
+install:
+    - sudo start-docker-daemon
+
+script:
+  - sbt ++$TRAVIS_SCALA_VERSION clean scalastyle coverage test coverageReport;
+  - source  /usr/local/share/bash/travis_helpers.bash
+  - pushd deploy/paas
+  - paas_files_upload
+  - pipeline_upload
+  - paas_config_upload
+  - popd
+
+after_failure:
+  - reports-publisher
+
+after_success:
+  - reports-publisher
+#  TODO: in later PR remove this section and add sbt publish to deploy step
+  - sbt ++$TRAVIS_SCALA_VERSION dockerPublish
